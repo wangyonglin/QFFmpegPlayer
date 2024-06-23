@@ -1,5 +1,5 @@
-#ifndef AVSYNCHRONIZE_H
-#define AVSYNCHRONIZE_H
+#ifndef QFFMPEGSYNCHRONIZER_H
+#define QFFMPEGSYNCHRONIZER_H
 
 extern "C" {
 #include <libavutil/pixfmt.h>
@@ -21,11 +21,11 @@ extern "C" {
 #include <iostream>
 #include <chrono>
 
-class AVSynchronize : public QWidget
+class QFFmpegSynchronizer : public QWidget
 {
     Q_OBJECT
 public:
-    explicit AVSynchronize(QWidget *parent = nullptr);
+    explicit QFFmpegSynchronizer(QWidget *parent = nullptr);
 
 
     void init_synchronize();
@@ -45,4 +45,4 @@ private:
     int64_t get_now_ms();
 };
 
-#endif // AVSYNCHRONIZE_H
+#endif // QFFMPEGSYNCHRONIZER_H

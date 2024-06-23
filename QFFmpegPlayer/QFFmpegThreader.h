@@ -1,5 +1,5 @@
-#ifndef QTHREADER_H
-#define QTHREADER_H
+#ifndef QFFMPEGTHREADER_H
+#define QFFMPEGTHREADER_H
 
 #include <QThread>
 #include <QObject>
@@ -7,12 +7,12 @@
 #include <QMutex>
 #include <QWaitCondition>
 
-class QThreader: public QThread
+class QFFmpegThreader: public QThread
 {
     Q_OBJECT
 public:
-    explicit QThreader(QObject *parent = nullptr);
-    ~QThreader() override;
+    explicit QFFmpegThreader(QObject *parent = nullptr);
+    ~QFFmpegThreader() override;
 
     enum State
     {
@@ -39,4 +39,4 @@ public:
     QMutex mutex;
     QWaitCondition condition;
 };
-#endif // QTHREADER_H
+#endif // QFFMPEGTHREADER_H

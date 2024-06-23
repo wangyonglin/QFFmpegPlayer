@@ -16,32 +16,30 @@ contains(DEFINES, unix)
 
 
 HEADERS += \
-    $$PWD/AVControllerFFmpeg.h \
-    $$PWD/AVDemuxer.h \
-    $$PWD/AVFrameQueue.h \
-    $$PWD/AVPacketQueue.h \
-    $$PWD/AVResample.h \
-    $$PWD/AVSynchronize.h \
-    $$PWD/AudioDecoder.h \
     $$PWD/AudioRender.h \
-    $$PWD/QFFmpeg.h \
+    $$PWD/QFFmpegAudioDecoder.h \
+    $$PWD/QFFmpegDemuxer.h \
+    $$PWD/QFFmpegFrame.h \
+    $$PWD/QFFmpegManager.h \
+    $$PWD/QFFmpegPacket.h \
     $$PWD/QFFmpegPlayer.h \
-    $$PWD/QImageUitls.h \
-    $$PWD/QThreader.h \
-    $$PWD/VideoDecoder.h
+    $$PWD/QFFmpegResampler.h \
+    $$PWD/QFFmpegSynchronizer.h \
+    $$PWD/QFFmpegThreader.h \
+    $$PWD/QFFmpegVideoDecoder.h \
+    $$PWD/QImageUitls.h
 
 SOURCES += \
-    $$PWD/AVControllerFFmpeg.cpp \
-    $$PWD/AVDemuxer.cpp \
-    $$PWD/AVFrameQueue.cpp \
-    $$PWD/AVPacketQueue.cpp \
-    $$PWD/AVResample.cpp \
-    $$PWD/AVSynchronize.cpp \
-    $$PWD/AudioDecoder.cpp \
     $$PWD/AudioRender.cpp \
-    $$PWD/QFFmpeg.cpp \
+    $$PWD/QFFmpegAudioDecoder.cpp \
+    $$PWD/QFFmpegDemuxer.cpp \
+    $$PWD/QFFmpegFrame.cpp \
+    $$PWD/QFFmpegManager.cpp \
+    $$PWD/QFFmpegPacket.cpp \
     $$PWD/QFFmpegPlayer.cpp \
-    $$PWD/QImageUitls.cpp \
-    $$PWD/QThreader.cpp \
-    $$PWD/VideoDecoder.cpp
+    $$PWD/QFFmpegResampler.cpp \
+    $$PWD/QFFmpegSynchronizer.cpp \
+    $$PWD/QFFmpegThreader.cpp \
+    $$PWD/QFFmpegVideoDecoder.cpp \
+    $$PWD/QImageUitls.cpp
 

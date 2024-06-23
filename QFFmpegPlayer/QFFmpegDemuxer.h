@@ -1,27 +1,29 @@
-#ifndef AVDEMUXER_H
-#define AVDEMUXER_H
-#include "QThreader.h"
+#ifndef QFFMPEGDEMUXER_H
+#define QFFMPEGDEMUXER_H
+#include "QFFmpegThreader.h"
 #include <QObject>
 
-#include "AVControllerFFmpeg.h"
-class AVDemuxer : public QThreader
+#include "QFFmpegManager.h"
+class QFFmpegDemuxer : public QFFmpegThreader
 {
     Q_OBJECT
 public:
-    explicit AVDemuxer(QObject *parent = nullptr);
+    explicit QFFmpegDemuxer(QObject *parent = nullptr);
 
 public:
     bool frameFinished=true;
-    AVControllerFFmpeg*controller;
+    QFFmpegManager*manager;
 public slots:
     virtual void start(Priority pri = InheritPriority);
     virtual void stop();
     virtual void pause();
     virtual void resume();
-    AVControllerFFmpeg* initParameters(AVControllerFFmpeg *controller);
-    void freeParameters(AVControllerFFmpeg *controller);
+    QFFmpegManager* initParameters(QFFmpegManager *controller);
+    void freeParameters(QFFmpegManager *controller);
 private:
     virtual void loopRunnable() Q_DECL_OVERRIDE;
+signals:
+    void demuxFinished();
 };
 
-#endif // AVDEMUXER_H
+#endif // QFFMPEGDEMUXER_H

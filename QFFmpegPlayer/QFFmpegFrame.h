@@ -1,5 +1,5 @@
-#ifndef AVFRAMEQUEUE_H
-#define AVFRAMEQUEUE_H
+#ifndef QFFMPEGFRAME_H
+#define QFFMPEGFRAME_H
 
 #include <QQueue>
 #include <QMutex>
@@ -14,11 +14,11 @@ extern "C"
 }
 #endif
 
-class AVFrameQueue : public QObject
+class QFFmpegFrame : public QObject
 {
     Q_OBJECT
 public:
-    explicit AVFrameQueue(QObject *parent = nullptr);
+    explicit QFFmpegFrame(QObject *parent = nullptr);
 
     void enqueue(AVFrame *frame);
     AVFrame* dequeue();
@@ -34,4 +34,4 @@ private:
     int this_maxSize=100;
 };
 
-#endif // AVFRAMEQUEUE_H
+#endif // QFFMPEGFRAME_H

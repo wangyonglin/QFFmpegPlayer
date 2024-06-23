@@ -1,17 +1,17 @@
-#include "QThreader.h"
+#include "QFFmpegThreader.h"
 
-QThreader::QThreader(QObject *parent)
+QFFmpegThreader::QFFmpegThreader(QObject *parent)
     : QThread(parent),
     pauseFlag(false),
     stopFlag(false)
 {}
 
-QThreader::~QThreader()
+QFFmpegThreader::~QFFmpegThreader()
 {
 
 }
 
-QThreader::State QThreader::state() const
+QFFmpegThreader::State QFFmpegThreader::state() const
 {
     State s = Stoped;
     if (!QThread::isRunning())
@@ -29,12 +29,12 @@ QThreader::State QThreader::state() const
     return s;
 }
 
-void QThreader::start(Priority pri)
+void QFFmpegThreader::start(Priority pri)
 {
     QThread::start(pri);
 }
 
-void QThreader::stop()
+void QFFmpegThreader::stop()
 {
     if (QThread::isRunning())
     {
@@ -45,7 +45,7 @@ void QThreader::stop()
     }
 }
 
-void QThreader::pause()
+void QFFmpegThreader::pause()
 {
     if (QThread::isRunning())
     {
@@ -53,7 +53,7 @@ void QThreader::pause()
     }
 }
 
-void QThreader::resume()
+void QFFmpegThreader::resume()
 {
     if (QThread::isRunning())
     {
@@ -62,7 +62,7 @@ void QThreader::resume()
     }
 }
 
-void QThreader::run()
+void QFFmpegThreader::run()
 {
     qDebug() << "enter thread : " << QThread::currentThreadId();
     while (!stopFlag)

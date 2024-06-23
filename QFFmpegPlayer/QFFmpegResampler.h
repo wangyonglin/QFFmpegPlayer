@@ -1,5 +1,5 @@
-#ifndef AVRESAMPLE_H
-#define AVRESAMPLE_H
+#ifndef QFFMPEGRESAMPLER_H
+#define QFFMPEGRESAMPLER_H
 extern "C" {
 #include <libavutil/pixfmt.h>
 #include "libavcodec/avcodec.h"
@@ -17,14 +17,14 @@ extern "C" {
 #include <QObject>
 #include <QDebug>
 
-class AVResample :public QObject{
+class QFFmpegResampler :public QObject{
 public:
-    explicit AVResample(QObject *parent = nullptr);
+    explicit QFFmpegResampler(QObject *parent = nullptr);
 
 
-    int InitAVResample(AVCodecContext *dec_ctx, int64_t dst_ch_layout, int dst_rate, AVSampleFormat dst_sample_fmt);
+    int InitQFFmpegResampler(AVCodecContext *dec_ctx, int64_t dst_ch_layout, int dst_rate, AVSampleFormat dst_sample_fmt);
     QByteArray BuiledConvert(AVFrame *frame);
-    void FreeAVResample();
+    void FreeQFFmpegResampler();
 
 private:
     struct SwrContext* swr_ctx;
@@ -40,4 +40,4 @@ private:
 };
 
 
-#endif // AVRESAMPLE_H
+#endif // QFFMPEGRESAMPLER_H

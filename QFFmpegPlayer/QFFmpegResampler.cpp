@@ -1,12 +1,12 @@
-#include "AVResample.h"
+#include "QFFmpegResampler.h"
 
-AVResample::AVResample(QObject *parent)
+QFFmpegResampler::QFFmpegResampler(QObject *parent)
     :QObject(parent)
 {
 
 }
 
-int  AVResample::InitAVResample(AVCodecContext * dec_ctx,
+int  QFFmpegResampler::InitQFFmpegResampler(AVCodecContext * dec_ctx,
                                int64_t dst_ch_layout,
                                int dst_rate,
                                enum AVSampleFormat dst_sample_fmt)
@@ -81,7 +81,7 @@ int  AVResample::InitAVResample(AVCodecContext * dec_ctx,
 
 
 
-QByteArray AVResample::BuiledConvert(AVFrame* frame)
+QByteArray QFFmpegResampler::BuiledConvert(AVFrame* frame)
 {
     QByteArray resByte;
     if(!frame) return  resByte;
@@ -141,7 +141,7 @@ QByteArray AVResample::BuiledConvert(AVFrame* frame)
     return resByte;
 }
 
-void AVResample::FreeAVResample()
+void QFFmpegResampler::FreeQFFmpegResampler()
 {
     if (src_data_)
         av_freep(&src_data_[0]);

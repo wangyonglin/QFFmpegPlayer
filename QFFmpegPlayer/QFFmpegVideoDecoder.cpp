@@ -1,18 +1,18 @@
-#include "VideoDecoder.h"
+#include "QFFmpegVideoDecoder.h"
 
-VideoDecoder::VideoDecoder(QObject *parent)
-    : QThreader{parent}
+QFFmpegVideoDecoder::QFFmpegVideoDecoder(QObject *parent)
+    : QFFmpegThreader{parent}
 {}
 
-AVControllerFFmpeg *VideoDecoder::initParameters( AVControllerFFmpeg * controller){
-    controller->video_codec_ctx = avcodec_alloc_context3(NULL);
-    if(!  controller->video_codec_ctx)return nullptr;
-    int read_ret = avcodec_parameters_to_context(  controller->video_codec_ctx, controller->video_codecpar);
+QFFmpegManager *QFFmpegVideoDecoder::initParameters( QFFmpegManager * manager){
+    manager->video_codec_ctx = avcodec_alloc_context3(NULL);
+    if(!  manager->video_codec_ctx)return nullptr;
+    int read_ret = avcodec_parameters_to_context(  manager->video_codec_ctx, manager->video_codecpar);
     if(read_ret < 0) {
         char errmsg[AV_ERROR_MAX_STRING_SIZE];
         av_make_error_string(errmsg,AV_ERROR_MAX_STRING_SIZE, read_ret);
         qDebug() << "avcodec_parameters_to_context failed" << errmsg;
-        avcodec_free_context(&  controller->video_codec_ctx);
+        avcodec_free_context(&  manager->video_codec_ctx);
         return nullptr;
     }
     // h264
@@ -22,81 +22,78 @@ AVControllerFFmpeg *VideoDecoder::initParameters( AVControllerFFmpeg * controlle
     //    if(AV_CODEC_ID_H264 == codec_ctx_->codec_id)
     //        codec = avcodec_find_decoder_by_name("h264_qsv");
     //    else
-const    AVCodec * codec = avcodec_find_decoder(  controller->video_codec_ctx->codec_id); //作业： 硬件解码
+const    AVCodec * codec = avcodec_find_decoder(  manager->video_codec_ctx->codec_id); //作业： 硬件解码
     if(!codec) {
         qDebug() << "avcodec_find_decoder failed";
-        avcodec_free_context(&  controller->video_codec_ctx);
+        avcodec_free_context(&  manager->video_codec_ctx);
         return nullptr;
     }
 
-    read_ret = avcodec_open2(  controller->video_codec_ctx, codec, NULL);
+    read_ret = avcodec_open2(  manager->video_codec_ctx, codec, NULL);
     if(read_ret < 0) {
         char errmsg[AV_ERROR_MAX_STRING_SIZE];
         av_make_error_string(errmsg,AV_ERROR_MAX_STRING_SIZE, read_ret);
         qDebug() << "avcodec_open2 failed" << errmsg;
-        avcodec_free_context(&  controller->video_codec_ctx);
+        avcodec_free_context(&  manager->video_codec_ctx);
         return nullptr;
     }
-    controller->YUV420BufferSize = av_image_get_buffer_size(
+    manager->YUV420BufferSize = av_image_get_buffer_size(
         AV_PIX_FMT_YUV420P,
-        controller->video_codec_ctx->width,
-        controller->video_codec_ctx->height,1);
-    controller->YUV420Buffer = (unsigned char *)av_malloc(controller->YUV420BufferSize*sizeof(uchar));
-    emit sigFirst( controller->YUV420Buffer,controller->video_codec_ctx->width,controller->video_codec_ctx->height);
-    this->controller=controller;
-    return  controller;
+        manager->video_codec_ctx->width,
+        manager->video_codec_ctx->height,1);
+    manager->YUV420Buffer = (unsigned char *)av_malloc(manager->YUV420BufferSize*sizeof(uchar));
+
+    emit sigFirst( manager->YUV420Buffer,manager->video_codec_ctx->width,manager->video_codec_ctx->height);
+    this->manager=manager;
+    return  manager;
 }
 
-void VideoDecoder::freeParameters(AVControllerFFmpeg * controller){
-    if( controller->video_codec_ctx){
-        avcodec_free_context(& controller->video_codec_ctx);
-        av_freep(controller->YUV420Buffer);
-        controller->YUV420Buffer=nullptr;
-        controller->video_codec_ctx=nullptr;
+void QFFmpegVideoDecoder::freeParameters(QFFmpegManager * manager){
+    if( manager->video_codec_ctx){
+        avcodec_free_context(& manager->video_codec_ctx);
+        manager->video_codec_ctx=nullptr;
     }
 }
 
-void VideoDecoder::loopRunnable()
+void QFFmpegVideoDecoder::loopRunnable()
 {
-    if(frameFinished){
-        QThreader::usleep(10);
-    }
+
     if(state()==Running && !frameFinished){
-        if (controller->get_video_synchronize() > controller->get_master_synchronize())
+        if (manager->get_video_synchronize() > manager->get_master_synchronize())
         {
              QThread::usleep(10);
             return;
         }
 
-        if(!controller->video_pkt_queue->isEmpty()){
-            if(controller->video_frame_queue->size()  <10){
-                BuildDecoder(controller->video_codec_ctx,controller->video_pkt_queue,controller->video_frame_queue);
+        if(!manager->video_pkt_queue->isEmpty()){
+            if(manager->video_frame_queue->size()  <10){
+                BuildDecoder(manager->video_codec_ctx,manager->video_pkt_queue,manager->video_frame_queue);
             }else{
                 QThread::usleep(200);
                 return;
             }
         }
 
-        if(!controller->video_frame_queue->isEmpty()){
-            AVFrame * yuvFrame= controller->video_frame_queue->dequeue();
+        if(!manager->video_frame_queue->isEmpty()){
+            AVFrame * yuvFrame= manager->video_frame_queue->dequeue();
             if(yuvFrame){
                int64_t pts_time= (yuvFrame->pts == AV_NOPTS_VALUE) ? NAN : yuvFrame->pts;
-                controller->video_synchronize(pts_time,controller->video_pts_begin,controller->video_pts_base);
+                manager->video_synchronize(pts_time,manager->video_pts_begin,manager->video_pts_base);
                 int bytes =0;
-                for(int i=0;i<controller->video_codec_ctx->height;i++){
-                    memcpy( controller->YUV420Buffer+bytes,yuvFrame->data[0]+yuvFrame->linesize[0]*i,controller->video_codec_ctx->width);
-                    bytes+=controller->video_codec_ctx->width;
+                for(int i=0;i<manager->video_codec_ctx->height;i++){
+                    memcpy( manager->YUV420Buffer+bytes,yuvFrame->data[0]+yuvFrame->linesize[0]*i,manager->video_codec_ctx->width);
+                    bytes+=manager->video_codec_ctx->width;
                 }
 
-                int u=controller->video_codec_ctx->height>>1;
+                int u=manager->video_codec_ctx->height>>1;
                 for(int i=0;i<u;i++){
-                    memcpy( controller->YUV420Buffer+bytes,yuvFrame->data[1]+yuvFrame->linesize[1]*i,controller->video_codec_ctx->width/2);
-                    bytes+=controller->video_codec_ctx->width/2;
+                    memcpy( manager->YUV420Buffer+bytes,yuvFrame->data[1]+yuvFrame->linesize[1]*i,manager->video_codec_ctx->width/2);
+                    bytes+=manager->video_codec_ctx->width/2;
                 }
 
                 for(int i=0;i<u;i++){
-                    memcpy( controller->YUV420Buffer+bytes,yuvFrame->data[2]+yuvFrame->linesize[2]*i,controller->video_codec_ctx->width/2);
-                    bytes+=controller->video_codec_ctx->width/2;
+                    memcpy( manager->YUV420Buffer+bytes,yuvFrame->data[2]+yuvFrame->linesize[2]*i,manager->video_codec_ctx->width/2);
+                    bytes+=manager->video_codec_ctx->width/2;
                 }
 
                 emit newFrame();
@@ -107,27 +104,27 @@ void VideoDecoder::loopRunnable()
     }
 }
 
-void VideoDecoder::start(Priority pri)
+void QFFmpegVideoDecoder::start(Priority pri)
 {
-    QThreader::start(pri);
+    QFFmpegThreader::start(pri);
 }
 
-void VideoDecoder::stop()
+void QFFmpegVideoDecoder::stop()
 {
-    QThreader::stop();
+    QFFmpegThreader::stop();
 }
 
-void VideoDecoder::pause()
+void QFFmpegVideoDecoder::pause()
 {
-    QThreader::pause();
+    QFFmpegThreader::pause();
 }
 
-void VideoDecoder::resume()
+void QFFmpegVideoDecoder::resume()
 {
-    QThreader::resume();
+    QFFmpegThreader::resume();
 }
 
-void VideoDecoder::BuildDecoder(AVCodecContext *codec_ctx,AVPacketQueue *pkt_queue,AVFrameQueue *frame_queue)
+void QFFmpegVideoDecoder::BuildDecoder(AVCodecContext *codec_ctx,QFFmpegPacket *pkt_queue, QFFmpegFrame *frame_queue)
 {
     if(!codec_ctx)return;
     if(pkt_queue->isEmpty())return;

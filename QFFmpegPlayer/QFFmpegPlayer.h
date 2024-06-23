@@ -9,14 +9,14 @@
 #include <QOpenGLWidget>
 #include <QOpenGLFunctions_3_3_Core>
 
-#include "AudioDecoder.h"
+#include "QFFmpegAudioDecoder.h"
 #include "AudioRender.h"
 
 #include <QWidget>
 #include <QObject>
 #include <QString>
-#include "AVDemuxer.h"
-#include "VideoDecoder.h"
+#include "QFFmpegDemuxer.h"
+#include "QFFmpegVideoDecoder.h"
 
 class QFFmpegPlayer : public QOpenGLWidget,public QOpenGLFunctions_3_3_Core
 {
@@ -31,10 +31,10 @@ public:
 
 
 private:
-    AVDemuxer *av_demux;
-    AudioDecoder *audio_dec;
-    VideoDecoder *video_dec;
-    AVControllerFFmpeg * controller;
+    QFFmpegDemuxer *av_demux;
+    QFFmpegAudioDecoder *audio_dec;
+    QFFmpegVideoDecoder *video_dec;
+    QFFmpegManager * manager;
     //shader程序
     QOpenGLShaderProgram m_program;
     QOpenGLBuffer vbo;
@@ -43,7 +43,8 @@ private:
     uchar* ptr;
     QImage imageUpdate;
 signals:
-    void start(QThreader::Priority pri = QThreader::InheritPriority);
+    void start(QFFmpegThreader::Priority pri = QFFmpegThreader::InheritPriority);
+    void finished();
     // QOpenGLWidget interface
 protected:
     virtual void initializeGL() override;

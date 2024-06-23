@@ -1,43 +1,43 @@
-#include "AudioDecoder.h"
+#include "QFFmpegAudioDecoder.h"
 #include <memory>
 #include <iostream>
 
 
-AudioDecoder::AudioDecoder(QObject *parent)
-    : QThreader(parent)
+QFFmpegAudioDecoder::QFFmpegAudioDecoder(QObject *parent)
+    : QFFmpegThreader(parent)
 {
 }
 
-AudioDecoder::~AudioDecoder()
+QFFmpegAudioDecoder::~QFFmpegAudioDecoder()
 {
 }
-void AudioDecoder::start(Priority pri)
+void QFFmpegAudioDecoder::start(Priority pri)
 {
-    QThreader::start(pri);
-}
-
-void AudioDecoder::stop()
-{
-    QThreader::stop();
-}
-void AudioDecoder::pause()
-{
-    QThreader::pause();
+    QFFmpegThreader::start(pri);
 }
 
-void AudioDecoder::resume()
+void QFFmpegAudioDecoder::stop()
 {
-    QThreader::resume();
+    QFFmpegThreader::stop();
+}
+void QFFmpegAudioDecoder::pause()
+{
+    QFFmpegThreader::pause();
 }
 
-AVControllerFFmpeg *AudioDecoder::initParameters(AVControllerFFmpeg * controller){
-    controller->audio_codec_ctx = avcodec_alloc_context3(NULL);
-    int read_ret = avcodec_parameters_to_context(controller->audio_codec_ctx, controller->audio_codecpar);
+void QFFmpegAudioDecoder::resume()
+{
+    QFFmpegThreader::resume();
+}
+
+QFFmpegManager *QFFmpegAudioDecoder::initParameters(QFFmpegManager * manager){
+    manager->audio_codec_ctx = avcodec_alloc_context3(NULL);
+    int read_ret = avcodec_parameters_to_context(manager->audio_codec_ctx, manager->audio_codecpar);
     if(read_ret < 0) {
         char errmsg[AV_ERROR_MAX_STRING_SIZE];
         av_make_error_string(errmsg,AV_ERROR_MAX_STRING_SIZE, read_ret);
         qDebug() << "avcodec_parameters_to_context failed" << errmsg;
-        avcodec_free_context(&controller->audio_codec_ctx);
+        avcodec_free_context(&manager->audio_codec_ctx);
         return nullptr;
     }
     // h264
@@ -47,63 +47,61 @@ AVControllerFFmpeg *AudioDecoder::initParameters(AVControllerFFmpeg * controller
     //    if(AV_CODEC_ID_H264 == codec_ctx_->codec_id)
     //        codec = avcodec_find_decoder_by_name("h264_qsv");
     //    else
-  const  AVCodec * codec = avcodec_find_decoder(controller->audio_codec_ctx->codec_id); //作业： 硬件解码
+  const  AVCodec * codec = avcodec_find_decoder(manager->audio_codec_ctx->codec_id); //作业： 硬件解码
     if(!codec) {
         qDebug() << "avcodec_find_decoder failed";
-        avcodec_free_context(&controller->audio_codec_ctx);
+        avcodec_free_context(&manager->audio_codec_ctx);
         return nullptr;
     }
 
-    read_ret = avcodec_open2(controller->audio_codec_ctx, codec, NULL);
+    read_ret = avcodec_open2(manager->audio_codec_ctx, codec, NULL);
     if(read_ret < 0) {
         char errmsg[AV_ERROR_MAX_STRING_SIZE];
         av_make_error_string(errmsg,AV_ERROR_MAX_STRING_SIZE, read_ret);
         qDebug() << "avcodec_open2 failed" << errmsg;
-        avcodec_free_context(&controller->audio_codec_ctx);
+        avcodec_free_context(&manager->audio_codec_ctx);
         return nullptr;
     }
-    this->controller=controller;
+    this->manager=manager;
 
-    av_resample.InitAVResample(controller->audio_codec_ctx,AV_CH_LAYOUT_STEREO,44100,AV_SAMPLE_FMT_S16);
+    av_resample.InitQFFmpegResampler(manager->audio_codec_ctx,AV_CH_LAYOUT_STEREO,44100,AV_SAMPLE_FMT_S16);
     int data_size = av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
     audio_render.InitFormat(0,44100,data_size*8,2);
-    return controller;
+    return manager;
 }
 
-void AudioDecoder::freeParameters(AVControllerFFmpeg * controller){
-    if(controller->audio_codec_ctx){
-        avcodec_free_context(&controller->audio_codec_ctx);
-        controller->audio_codec_ctx=nullptr;
+void QFFmpegAudioDecoder::freeParameters(QFFmpegManager * manager){
+    if(manager->audio_codec_ctx){
+        avcodec_free_context(&manager->audio_codec_ctx);
+        manager->audio_codec_ctx=nullptr;
     }
-    av_resample.FreeAVResample();
+    av_resample.FreeQFFmpegResampler();
 }
 
 
-void AudioDecoder::loopRunnable()
+void QFFmpegAudioDecoder::loopRunnable()
 {
-    if(frameFinished){
-        QThreader::usleep(10);
-    }
+
     if(state()==Running && !frameFinished){
-        if (controller->get_audio_synchronize() > controller->get_master_synchronize())
+        if (manager->get_audio_synchronize() > manager->get_master_synchronize())
         {
             QThread::usleep(10);
             return;
         }
-        if(!controller->audio_pkt_queue->isEmpty()){
-            if(controller->audio_frame_queue->size() <10){
-                BuildDecoder(controller->audio_codec_ctx,controller->audio_pkt_queue,controller->audio_frame_queue);
+        if(!manager->audio_pkt_queue->isEmpty()){
+            if(manager->audio_frame_queue->size() <10){
+                BuildDecoder(manager->audio_codec_ctx,manager->audio_pkt_queue,manager->audio_frame_queue);
             }else{
                 QThread::usleep(200);
                 return;
             }
         }
 
-        if(!controller->audio_frame_queue->isEmpty()){
-            AVFrame * frame= controller->audio_frame_queue->dequeue();
+        if(!manager->audio_frame_queue->isEmpty()){
+            AVFrame * frame= manager->audio_frame_queue->dequeue();
             if(frame){
                 int64_t pts_time= (frame->pts == AV_NOPTS_VALUE) ? NAN : frame->pts;
-                controller->audio_synchronize(pts_time,controller->audio_pts_begin,controller->audio_pts_base);
+                manager->audio_synchronize(pts_time,manager->audio_pts_begin,manager->audio_pts_base);
                 QByteArray bytes= av_resample.BuiledConvert(frame);
                 audio_render.WriteOutput(bytes);
                 av_frame_free(&frame);
@@ -117,7 +115,7 @@ void AudioDecoder::loopRunnable()
 
 
 
-void AudioDecoder::BuildDecoder(AVCodecContext *codec_ctx,AVPacketQueue *pkt_queue,AVFrameQueue *frame_queue)
+void QFFmpegAudioDecoder::BuildDecoder(AVCodecContext *codec_ctx,QFFmpegPacket *pkt_queue, QFFmpegFrame *frame_queue)
 {
     if(!codec_ctx)return;
     if(pkt_queue->isEmpty())return;

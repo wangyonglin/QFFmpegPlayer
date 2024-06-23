@@ -1,5 +1,5 @@
-#ifndef AVPACKETQUEUE_H
-#define AVPACKETQUEUE_H
+#ifndef QFFMPEGPACKET_H
+#define QFFMPEGPACKET_H
 
 #include <QQueue>
 #include <QMutex>
@@ -15,11 +15,11 @@ extern "C"
 #endif
 
 
-class AVPacketQueue : public QObject
+class QFFmpegPacket : public QObject
 {
     Q_OBJECT
 public:
-    explicit AVPacketQueue(QObject *parent = nullptr);
+    explicit QFFmpegPacket(QObject *parent = nullptr);
     void enqueue(AVPacket *packet);
     AVPacket* dequeue();
     void clear();
@@ -34,4 +34,4 @@ private:
     int this_maxSize=100;
 };
 
-#endif // AVPACKETQUEUE_H
+#endif // QFFMPEGPACKET_H

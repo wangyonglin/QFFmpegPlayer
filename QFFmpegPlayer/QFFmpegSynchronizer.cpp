@@ -1,26 +1,26 @@
-#include "AVSynchronize.h"
+#include "QFFmpegSynchronizer.h"
 
-AVSynchronize::AVSynchronize(QWidget *parent)
+QFFmpegSynchronizer::QFFmpegSynchronizer(QWidget *parent)
     : QWidget{parent}
 {}
 
-void AVSynchronize::audio_synchronize(int64_t  pts_time,int64_t start_time,AVRational timebase)
+void QFFmpegSynchronizer::audio_synchronize(int64_t  pts_time,int64_t start_time,AVRational timebase)
 {
     __audio_pts_time = (pts_time - start_time) * av_q2d(timebase) * 1000;
 }
-void AVSynchronize::video_synchronize(int64_t  pts_time,int64_t start_time,AVRational timebase)
+void QFFmpegSynchronizer::video_synchronize(int64_t  pts_time,int64_t start_time,AVRational timebase)
 {
     __video_pts_time = (pts_time- start_time) * av_q2d(timebase) * 1000;
 }
-int64_t AVSynchronize::get_audio_synchronize()
+int64_t QFFmpegSynchronizer::get_audio_synchronize()
 {
     return __audio_pts_time;
 }
-int64_t AVSynchronize::get_video_synchronize()
+int64_t QFFmpegSynchronizer::get_video_synchronize()
 {
     return __video_pts_time;
 }
-void AVSynchronize::init_synchronize()
+void QFFmpegSynchronizer::init_synchronize()
 {
     QMutexLocker locker(&mutex);
     __locktime_root_flag=false;
@@ -29,7 +29,7 @@ void AVSynchronize::init_synchronize()
     __video_pts_time=0;
 
 }
-void AVSynchronize::start_synchronize()
+void QFFmpegSynchronizer::start_synchronize()
 {
     QMutexLocker locker(&mutex);
     if (!__locktime_root_flag)
@@ -39,13 +39,13 @@ void AVSynchronize::start_synchronize()
     }
 }
 
-int64_t AVSynchronize::get_now_ms()
+int64_t QFFmpegSynchronizer::get_now_ms()
 {
     auto now = std::chrono::system_clock::now();
     return std::chrono::duration_cast<std::chrono::milliseconds>(now.time_since_epoch()).count();
 }
 
-int64_t AVSynchronize::get_master_synchronize()
+int64_t QFFmpegSynchronizer::get_master_synchronize()
 {
     QMutexLocker locker(&mutex);
     int64_t curr_time= get_now_ms();

@@ -2,6 +2,8 @@
 #define WIDGET_H
 
 #include <QWidget>
+#include <QMessageBox>
+
 #include <QFFmpegPlayer/QFFmpegPlayer.h>
 class Widget : public QWidget
 {
@@ -15,5 +17,9 @@ public:
     // QWidget interface
 protected:
     virtual void resizeEvent(QResizeEvent *event) override;
+
+    // QWidget interface
+protected:
+    virtual void keyPressEvent(QKeyEvent *event) override;
 };
 #endif // WIDGET_H

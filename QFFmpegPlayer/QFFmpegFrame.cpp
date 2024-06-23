@@ -1,9 +1,9 @@
-#include "AVFrameQueue.h"
+#include "QFFmpegFrame.h"
 
-AVFrameQueue::AVFrameQueue(QObject *parent)
+QFFmpegFrame::QFFmpegFrame(QObject *parent)
     : QObject{parent}
 {}
-void AVFrameQueue::enqueue(AVFrame *frame) {
+void QFFmpegFrame::enqueue(AVFrame *frame) {
     QMutexLocker locker(&mutex);
     if(frame){
         if(frameQueue.size() <= this_maxSize){
@@ -16,7 +16,7 @@ void AVFrameQueue::enqueue(AVFrame *frame) {
 
 }
 
-AVFrame* AVFrameQueue::dequeue() {
+AVFrame* QFFmpegFrame::dequeue() {
     QMutexLocker locker(&mutex);
     while (frameQueue.isEmpty()) {
         waitCondition.wait(&mutex);
@@ -25,7 +25,7 @@ AVFrame* AVFrameQueue::dequeue() {
     return frameQueue.dequeue();
 }
 
-void AVFrameQueue::clear() {
+void QFFmpegFrame::clear() {
     QMutexLocker locker(&mutex);
     while (!frameQueue.isEmpty()) {
         AVFrame *frame = frameQueue.dequeue();
@@ -35,17 +35,17 @@ void AVFrameQueue::clear() {
     }
 }
 
-int AVFrameQueue::size()
+int QFFmpegFrame::size()
 {
     return frameQueue.size();
 }
 
-bool AVFrameQueue::isEmpty()
+bool QFFmpegFrame::isEmpty()
 {
     return frameQueue.isEmpty();
 }
 
-bool AVFrameQueue::isFulled()
+bool QFFmpegFrame::isFulled()
 {
     if(!frameQueue.isEmpty()){
         if(frameQueue.size()>=this_maxSize){

@@ -1,5 +1,5 @@
-#ifndef AVCONTROLLERFFMPEG_H
-#define AVCONTROLLERFFMPEG_H
+#ifndef QFFMPEGMANAGER_H
+#define QFFMPEGMANAGER_H
 
 extern "C" {
 #include <libavutil/pixfmt.h>
@@ -16,20 +16,20 @@ extern "C" {
 }
 
 #include <QWidget>
-#include "AVPacketQueue.h"
-#include "AVFrameQueue.h"
-#include "AVSynchronize.h"
+#include "QFFmpegPacket.h"
+#include "QFFmpegFrame.h"
+#include "QFFmpegSynchronizer.h"
 
-class AVControllerFFmpeg : public AVSynchronize
+class QFFmpegManager : public QFFmpegSynchronizer
 {
     Q_OBJECT
 public:
-    explicit AVControllerFFmpeg(QWidget *parent = nullptr);
+    explicit QFFmpegManager(QWidget *parent = nullptr);
 public:
-    AVPacketQueue *audio_pkt_queue=nullptr;
-    AVPacketQueue *video_pkt_queue=nullptr;
-    AVFrameQueue *audio_frame_queue=nullptr;
-    AVFrameQueue *video_frame_queue=nullptr;
+    QFFmpegPacket *audio_pkt_queue=nullptr;
+    QFFmpegPacket *video_pkt_queue=nullptr;
+    QFFmpegFrame *audio_frame_queue=nullptr;
+    QFFmpegFrame *video_frame_queue=nullptr;
     QString url;
     AVFormatContext *ifmt_ctx=nullptr;
     int audio_stream_index=-1;
@@ -63,4 +63,4 @@ private:
     QWaitCondition waitCondition;
 };
 
-#endif // AVCONTROLLERFFMPEG_H
+#endif // QFFMPEGMANAGER_H
