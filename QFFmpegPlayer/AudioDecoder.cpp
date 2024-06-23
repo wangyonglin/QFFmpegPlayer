@@ -30,7 +30,7 @@ void AudioDecoder::resume()
     QThreader::resume();
 }
 
-AVController *AudioDecoder::initParameters(AVController * controller){
+AVControllerFFmpeg *AudioDecoder::initParameters(AVControllerFFmpeg * controller){
     controller->audio_codec_ctx = avcodec_alloc_context3(NULL);
     int read_ret = avcodec_parameters_to_context(controller->audio_codec_ctx, controller->audio_codecpar);
     if(read_ret < 0) {
@@ -70,7 +70,7 @@ AVController *AudioDecoder::initParameters(AVController * controller){
     return controller;
 }
 
-void AudioDecoder::freeParameters(AVController * controller){
+void AudioDecoder::freeParameters(AVControllerFFmpeg * controller){
     if(controller->audio_codec_ctx){
         avcodec_free_context(&controller->audio_codec_ctx);
         controller->audio_codec_ctx=nullptr;

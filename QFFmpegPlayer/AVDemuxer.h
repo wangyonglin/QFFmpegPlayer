@@ -3,7 +3,7 @@
 #include "QThreader.h"
 #include <QObject>
 
-#include "AVController.h"
+#include "AVControllerFFmpeg.h"
 class AVDemuxer : public QThreader
 {
     Q_OBJECT
@@ -12,14 +12,14 @@ public:
 
 public:
     bool frameFinished=true;
-    AVController*controller;
+    AVControllerFFmpeg*controller;
 public slots:
     virtual void start(Priority pri = InheritPriority);
     virtual void stop();
     virtual void pause();
     virtual void resume();
-    AVController* initParameters(AVController *controller);
-    void freeParameters(AVController *controller);
+    AVControllerFFmpeg* initParameters(AVControllerFFmpeg *controller);
+    void freeParameters(AVControllerFFmpeg *controller);
 private:
     virtual void loopRunnable() Q_DECL_OVERRIDE;
 };

@@ -3,7 +3,7 @@
 
 #include <QObject>
 #include "QThreader.h"
-#include "AVController.h"
+#include "AVControllerFFmpeg.h"
 
 class VideoDecoder : public QThreader
 {
@@ -13,18 +13,20 @@ public:
     bool frameFinished= true;
 private:
     virtual void loopRunnable();
-    AVController * controller;
+    AVControllerFFmpeg * controller;
+    AVFrame         *yuvFrame     = NULL;
     void BuildDecoder(AVCodecContext *codec_ctx, AVPacketQueue *pkt_queue, AVFrameQueue *frame_queue);
-    QImage AVFrame2RGBA8888(AVFrame *frame);
 public slots:
     virtual void start(Priority pri = InheritPriority);
     virtual void stop();
     virtual void pause();
     virtual void resume();
-    void freeParameters( AVController * controller);
-    AVController *initParameters( AVController * controller);
+    void freeParameters( AVControllerFFmpeg * controller);
+    AVControllerFFmpeg *initParameters( AVControllerFFmpeg * controller);
 signals:
     void drawImage(const QImage &image);
+    void sigFirst(uchar* p,int w,int h);
+    void newFrame();
 };
 
 #endif // VIDEODECODER_H

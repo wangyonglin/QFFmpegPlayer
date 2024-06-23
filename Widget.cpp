@@ -5,11 +5,11 @@ Widget::Widget(QWidget *parent)
     player(new QFFmpegPlayer(this))
 {
     resize(800,600);
-    player->play("/home/wangyonglin/视频/713991376-1-192.mp4");
+    player->play("/home/wangyonglin/视频/405348542-1-16.mp4");
 }
 
 Widget::~Widget() {
-    player->free();
+    player->stop();
     delete player;
 }
 

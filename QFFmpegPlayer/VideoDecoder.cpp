@@ -4,7 +4,7 @@ VideoDecoder::VideoDecoder(QObject *parent)
     : QThreader{parent}
 {}
 
-AVController *VideoDecoder::initParameters( AVController * controller){
+AVControllerFFmpeg *VideoDecoder::initParameters( AVControllerFFmpeg * controller){
     controller->video_codec_ctx = avcodec_alloc_context3(NULL);
     if(!  controller->video_codec_ctx)return nullptr;
     int read_ret = avcodec_parameters_to_context(  controller->video_codec_ctx, controller->video_codecpar);
@@ -37,13 +37,21 @@ const    AVCodec * codec = avcodec_find_decoder(  controller->video_codec_ctx->c
         avcodec_free_context(&  controller->video_codec_ctx);
         return nullptr;
     }
+    controller->YUV420BufferSize = av_image_get_buffer_size(
+        AV_PIX_FMT_YUV420P,
+        controller->video_codec_ctx->width,
+        controller->video_codec_ctx->height,1);
+    controller->YUV420Buffer = (unsigned char *)av_malloc(controller->YUV420BufferSize*sizeof(uchar));
+    emit sigFirst( controller->YUV420Buffer,controller->video_codec_ctx->width,controller->video_codec_ctx->height);
     this->controller=controller;
     return  controller;
 }
 
-void VideoDecoder::freeParameters(AVController * controller){
+void VideoDecoder::freeParameters(AVControllerFFmpeg * controller){
     if( controller->video_codec_ctx){
         avcodec_free_context(& controller->video_codec_ctx);
+        av_freep(controller->YUV420Buffer);
+        controller->YUV420Buffer=nullptr;
         controller->video_codec_ctx=nullptr;
     }
 }
@@ -70,13 +78,29 @@ void VideoDecoder::loopRunnable()
         }
 
         if(!controller->video_frame_queue->isEmpty()){
-            AVFrame * frame= controller->video_frame_queue->dequeue();
-            if(frame){
-               int64_t pts_time= (frame->pts == AV_NOPTS_VALUE) ? NAN : frame->pts;
+            AVFrame * yuvFrame= controller->video_frame_queue->dequeue();
+            if(yuvFrame){
+               int64_t pts_time= (yuvFrame->pts == AV_NOPTS_VALUE) ? NAN : yuvFrame->pts;
                 controller->video_synchronize(pts_time,controller->video_pts_begin,controller->video_pts_base);
-                QImage image = AVFrame2RGBA8888(frame);
-                emit drawImage(image);
-                av_frame_free(&frame);
+                int bytes =0;
+                for(int i=0;i<controller->video_codec_ctx->height;i++){
+                    memcpy( controller->YUV420Buffer+bytes,yuvFrame->data[0]+yuvFrame->linesize[0]*i,controller->video_codec_ctx->width);
+                    bytes+=controller->video_codec_ctx->width;
+                }
+
+                int u=controller->video_codec_ctx->height>>1;
+                for(int i=0;i<u;i++){
+                    memcpy( controller->YUV420Buffer+bytes,yuvFrame->data[1]+yuvFrame->linesize[1]*i,controller->video_codec_ctx->width/2);
+                    bytes+=controller->video_codec_ctx->width/2;
+                }
+
+                for(int i=0;i<u;i++){
+                    memcpy( controller->YUV420Buffer+bytes,yuvFrame->data[2]+yuvFrame->linesize[2]*i,controller->video_codec_ctx->width/2);
+                    bytes+=controller->video_codec_ctx->width/2;
+                }
+
+                emit newFrame();
+                av_frame_free(&yuvFrame);
             }
 
         }
@@ -133,40 +157,3 @@ void VideoDecoder::BuildDecoder(AVCodecContext *codec_ctx,AVPacketQueue *pkt_que
     av_frame_free(&frame);
 }
 
-QImage VideoDecoder::AVFrame2RGBA8888(AVFrame *frame)
-{
-    if((!frame) || (frame->width<=0) || (frame->height<=0)){
-        return QImage();
-    }
-
-    QImage img(frame->width, frame->height, QImage::Format_RGBA8888);
-
-    SwsContext* sws_ctx = sws_getContext(frame->width,
-                                         frame->height,
-                                         static_cast<enum AVPixelFormat>(frame->format),
-                                         frame->width,
-                                         frame->height,
-                                         AV_PIX_FMT_RGBA,
-                                         SWS_BILINEAR,
-                                         nullptr,
-                                         nullptr,
-                                         nullptr);
-
-
-    if (!sws_ctx) {
-        // 错误处理：sws_getContext 失败
-        qDebug() << "sws_getContext failed.";
-        return QImage();
-    }
-
-    uint8_t* data[1] = { reinterpret_cast<uint8_t*>(img.bits()) };
-    int linesize[1] = { static_cast<int>(img.bytesPerLine()) };
-    int ret = sws_scale(sws_ctx, frame->data, frame->linesize, 0, frame->height, data, linesize);
-    sws_freeContext(sws_ctx);
-    if (ret != frame->height) {
-        // 错误处理：sws_scale 失败
-        qDebug() << "sws_scale failed.";
-        return QImage();
-    }
-    return img;
-}

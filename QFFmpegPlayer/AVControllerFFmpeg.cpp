@@ -1,6 +1,6 @@
-#include "AVController.h"
+#include "AVControllerFFmpeg.h"
 
-AVController::AVController(QWidget *parent)
+AVControllerFFmpeg::AVControllerFFmpeg(QWidget *parent)
     : AVSynchronize{parent},
 
     audio_pkt_queue(new AVPacketQueue(this)),

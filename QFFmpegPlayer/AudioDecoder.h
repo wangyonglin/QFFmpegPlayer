@@ -7,7 +7,7 @@
 #include "AVPacketQueue.h"
 #include "AVFrameQueue.h"
 #include "AVResample.h"
-#include "AVController.h"
+#include "AVControllerFFmpeg.h"
 class AudioDecoder : public QThreader
 {
     Q_OBJECT
@@ -20,14 +20,14 @@ private:
     virtual void loopRunnable();
     AVResample av_resample;
     AudioRender audio_render;
-    AVController * controller;
+    AVControllerFFmpeg * controller;
     void BuildDecoder(AVCodecContext *codec_ctx, AVPacketQueue *pkt_queue, AVFrameQueue *frame_queue);
 public slots:
     virtual void start(Priority pri = InheritPriority);
     virtual void stop();
     virtual void pause();
     virtual void resume();
-    void freeParameters(AVController * controller);
-    AVController *initParameters(AVController * controller);
+    void freeParameters(AVControllerFFmpeg * controller);
+    AVControllerFFmpeg *initParameters(AVControllerFFmpeg * controller);
 };
 #endif // AUDIODECODER_H

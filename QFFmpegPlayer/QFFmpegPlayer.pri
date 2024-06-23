@@ -16,7 +16,7 @@ contains(DEFINES, unix)
 
 
 HEADERS += \
-    $$PWD/AVController.h \
+    $$PWD/AVControllerFFmpeg.h \
     $$PWD/AVDemuxer.h \
     $$PWD/AVFrameQueue.h \
     $$PWD/AVPacketQueue.h \
@@ -24,15 +24,14 @@ HEADERS += \
     $$PWD/AVSynchronize.h \
     $$PWD/AudioDecoder.h \
     $$PWD/AudioRender.h \
-    $$PWD/GLWidgetRenderer.h \
     $$PWD/QFFmpeg.h \
     $$PWD/QFFmpegPlayer.h \
+    $$PWD/QImageUitls.h \
     $$PWD/QThreader.h \
-    $$PWD/VideoDecoder.h \
-    $$PWD/VideoRender.h
+    $$PWD/VideoDecoder.h
 
 SOURCES += \
-    $$PWD/AVController.cpp \
+    $$PWD/AVControllerFFmpeg.cpp \
     $$PWD/AVDemuxer.cpp \
     $$PWD/AVFrameQueue.cpp \
     $$PWD/AVPacketQueue.cpp \
@@ -40,10 +39,9 @@ SOURCES += \
     $$PWD/AVSynchronize.cpp \
     $$PWD/AudioDecoder.cpp \
     $$PWD/AudioRender.cpp \
-    $$PWD/GLWidgetRenderer.cpp \
     $$PWD/QFFmpeg.cpp \
     $$PWD/QFFmpegPlayer.cpp \
+    $$PWD/QImageUitls.cpp \
     $$PWD/QThreader.cpp \
-    $$PWD/VideoDecoder.cpp \
-    $$PWD/VideoRender.cpp
+    $$PWD/VideoDecoder.cpp
 

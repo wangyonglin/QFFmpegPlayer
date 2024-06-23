@@ -1,5 +1,5 @@
-#ifndef AVCONTROLLER_H
-#define AVCONTROLLER_H
+#ifndef AVCONTROLLERFFMPEG_H
+#define AVCONTROLLERFFMPEG_H
 
 extern "C" {
 #include <libavutil/pixfmt.h>
@@ -20,11 +20,11 @@ extern "C" {
 #include "AVFrameQueue.h"
 #include "AVSynchronize.h"
 
-class AVController : public AVSynchronize
+class AVControllerFFmpeg : public AVSynchronize
 {
     Q_OBJECT
 public:
-    explicit AVController(QWidget *parent = nullptr);
+    explicit AVControllerFFmpeg(QWidget *parent = nullptr);
 public:
     AVPacketQueue *audio_pkt_queue=nullptr;
     AVPacketQueue *video_pkt_queue=nullptr;
@@ -54,9 +54,13 @@ public:
     enum AVSampleFormat dst_sample_fmt_;
     enum AVSampleFormat src_sample_fmt_;
     int data_size=0;
+    //Video Readerer
+    int YUV420BufferSize=0;
+    uchar *YUV420Buffer= nullptr;
+    bool isFirst = true;
 private:
     QMutex mutex;
     QWaitCondition waitCondition;
 };
 
-#endif // AVCONTROLLER_H
+#endif // AVCONTROLLERFFMPEG_H

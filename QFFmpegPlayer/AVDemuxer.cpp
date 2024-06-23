@@ -4,7 +4,7 @@ AVDemuxer::AVDemuxer(QObject *parent)
 {
 
 }
-AVController* AVDemuxer::initParameters(AVController *controller){
+AVControllerFFmpeg* AVDemuxer::initParameters(AVControllerFFmpeg *controller){
     if(controller->url.isEmpty())return nullptr;
     if(controller->ifmt_ctx)avformat_free_context( controller->ifmt_ctx);
     controller->ifmt_ctx=nullptr;
@@ -28,7 +28,7 @@ AVController* AVDemuxer::initParameters(AVController *controller){
     return controller;
 
 }
-void AVDemuxer::freeParameters(AVController *controller){
+void AVDemuxer::freeParameters(AVControllerFFmpeg *controller){
     if(controller->ifmt_ctx){
         avformat_close_input(&controller->ifmt_ctx);
         controller->ifmt_ctx=nullptr;
