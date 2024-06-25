@@ -23,7 +23,6 @@ void Widget::keyPressEvent(QKeyEvent *event)
 {
     if (event->key() == Qt::Key_Escape) {
         if (QMessageBox::question(this, "退出", "确定要退出吗？", QMessageBox::Yes | QMessageBox::No) == QMessageBox::Yes) {
-
             player->stop();
             QApplication::exit();
             event->accept();

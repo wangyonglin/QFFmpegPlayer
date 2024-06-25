@@ -16,20 +16,20 @@ QFFmpegManager *QFFmpegVideoDecoder::initParameters( QFFmpegManager * manager){
         return nullptr;
     }
     // h264
-    // h264_qsv  AV_CODEC_ID_H264
-    //    avcodec_find_decoder_by_name()
+    //h264_qsv  AV_CODEC_ID_H264
+     //  avcodec_find_decoder_by_name()
 
-    //    if(AV_CODEC_ID_H264 == codec_ctx_->codec_id)
-    //        codec = avcodec_find_decoder_by_name("h264_qsv");
-    //    else
-const    AVCodec * codec = avcodec_find_decoder(  manager->video_codec_ctx->codec_id); //作业： 硬件解码
-    if(!codec) {
+       // if(AV_CODEC_ID_H264 == manager->video_codec_ctx->codec_id)
+       //    manager-> codec = avcodec_find_decoder_by_name("h264_qsv");
+       // else
+        manager->codec = avcodec_find_decoder(  manager->video_codec_ctx->codec_id); //作业： 硬件解码
+    if(!manager->codec) {
         qDebug() << "avcodec_find_decoder failed";
         avcodec_free_context(&  manager->video_codec_ctx);
         return nullptr;
     }
 
-    read_ret = avcodec_open2(  manager->video_codec_ctx, codec, NULL);
+    read_ret = avcodec_open2(  manager->video_codec_ctx, manager->codec, NULL);
     if(read_ret < 0) {
         char errmsg[AV_ERROR_MAX_STRING_SIZE];
         av_make_error_string(errmsg,AV_ERROR_MAX_STRING_SIZE, read_ret);
@@ -41,7 +41,13 @@ const    AVCodec * codec = avcodec_find_decoder(  manager->video_codec_ctx->code
         AV_PIX_FMT_YUV420P,
         manager->video_codec_ctx->width,
         manager->video_codec_ctx->height,1);
+    if(manager->YUV420Buffer){
+        av_free( manager->YUV420Buffer);
+        manager->YUV420Buffer=nullptr;
+    }
     manager->YUV420Buffer = (unsigned char *)av_malloc(manager->YUV420BufferSize*sizeof(uchar));
+
+
 
     emit sigFirst( manager->YUV420Buffer,manager->video_codec_ctx->width,manager->video_codec_ctx->height);
     this->manager=manager;

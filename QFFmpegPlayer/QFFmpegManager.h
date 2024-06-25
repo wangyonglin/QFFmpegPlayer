@@ -30,6 +30,7 @@ public:
     QFFmpegPacket *video_pkt_queue=nullptr;
     QFFmpegFrame *audio_frame_queue=nullptr;
     QFFmpegFrame *video_frame_queue=nullptr;
+    const    AVCodec * codec=nullptr;
     QString url;
     AVFormatContext *ifmt_ctx=nullptr;
     int audio_stream_index=-1;
