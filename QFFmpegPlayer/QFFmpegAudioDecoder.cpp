@@ -66,7 +66,7 @@ QFFmpegManager *QFFmpegAudioDecoder::initParameters(QFFmpegManager * manager){
 
     av_resample.InitQFFmpegResampler(manager->audio_codec_ctx,AV_CH_LAYOUT_STEREO,44100,AV_SAMPLE_FMT_S16);
     int data_size = av_get_bytes_per_sample(AV_SAMPLE_FMT_S16);
-    audio_render.InitFormat(0,44100,data_size*8,2);
+    render.InitFormat(0,44100,data_size*8,2);
     return manager;
 }
 
@@ -103,7 +103,7 @@ void QFFmpegAudioDecoder::loopRunnable()
                 int64_t pts_time= (frame->pts == AV_NOPTS_VALUE) ? NAN : frame->pts;
                 manager->audio_synchronize(pts_time,manager->audio_pts_begin,manager->audio_pts_base);
                 QByteArray bytes= av_resample.BuiledConvert(frame);
-                audio_render.WriteOutput(bytes);
+                render.WriteOutput(bytes);
                 av_frame_free(&frame);
             }
 

@@ -5,7 +5,7 @@ Widget::Widget(QWidget *parent)
     player(new QFFmpegPlayer(this))
 {
     resize(800,600);
-    player->play("/home/wangyonglin/视频/405348542-1-16.mp4");
+    player->play("http://vjs.zencdn.net/v/oceans.mp4");
 }
 
 Widget::~Widget() {
@@ -30,9 +30,9 @@ void Widget::keyPressEvent(QKeyEvent *event)
             event->ignore();
         }
     }else if(event->key() == Qt::Key_F11){
-        player->play("/home/wangyonglin/视频/713991376-1-192.mp4");
+        player->play("http://wangyonglin.oss-cn-shanghai.aliyuncs.com/oceans.mp4");
     }else if(event->key() == Qt::Key_F12){
-        player->play("/home/wangyonglin/视频/405348542-1-16.mp4");
+        player->play("http://wangyonglin.oss-cn-shanghai.aliyuncs.com/405348542-1-16.mp4");
     }else if(event->key() == Qt::Key_F8){
         player->play("http://vjs.zencdn.net/v/oceans.mp4");
 

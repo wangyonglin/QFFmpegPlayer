@@ -1,5 +1,5 @@
-#ifndef AUDIORENDER_H
-#define AUDIORENDER_H
+#ifndef QFFMPEGRENDER_H
+#define QFFMPEGRENDER_H
 
 
 #include <QApplication>
@@ -12,12 +12,12 @@
 #include <QPaintEvent>
 #include <QPainter>
 
-class AudioRender: public QObject
+class QFFmpegRender: public QObject
 {
     Q_OBJECT
 public:
-    explicit AudioRender(QObject *parent = nullptr);
-    ~AudioRender();
+    explicit QFFmpegRender(QObject *parent = nullptr);
+    ~QFFmpegRender();
 
     void InitFormat(int dst_nb_samples, int rate, int sample_size, int nch);
     void WriteOutput(const char* data, qint64 len);
@@ -32,4 +32,4 @@ private:
 signals:
 };
 
-#endif // AUDIORENDER_H
+#endif // QFFMPEGRENDER_H

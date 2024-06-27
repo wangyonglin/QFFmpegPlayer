@@ -1,19 +1,19 @@
-#include "AudioRender.h"
+#include "QFFmpegRender.h"
 
-AudioRender::AudioRender(QObject *parent)
+QFFmpegRender::QFFmpegRender(QObject *parent)
     : QObject{parent}
 {
 
 }
 
-AudioRender::~AudioRender()
+QFFmpegRender::~QFFmpegRender()
 {
 
 }
 
 
 
-void AudioRender::InitFormat(int dst_nb_samples, int rate, int sample_size, int nch)
+void QFFmpegRender::InitFormat(int dst_nb_samples, int rate, int sample_size, int nch)
 {
 
     QAudioFormat format;
@@ -35,16 +35,16 @@ void AudioRender::InitFormat(int dst_nb_samples, int rate, int sample_size, int 
     outputDevice = audioOutput->start();
 }
 
-void AudioRender::WriteOutput(const char *data, qint64 len)
+void QFFmpegRender::WriteOutput(const char *data, qint64 len)
 {
     outputDevice->write(data, len);
 
 }
-void AudioRender::WriteOutput(QByteArray bytes){
+void QFFmpegRender::WriteOutput(QByteArray bytes){
     if(!bytes.isEmpty())
         outputDevice->write(bytes.data(), bytes.length());
 }
-void AudioRender::FreeFormat()
+void QFFmpegRender::FreeFormat()
 {
      audioOutput->stop();
 }

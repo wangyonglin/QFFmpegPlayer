@@ -16,30 +16,28 @@ contains(DEFINES, unix)
 
 
 HEADERS += \
-    $$PWD/AudioRender.h \
     $$PWD/QFFmpegAudioDecoder.h \
     $$PWD/QFFmpegDemuxer.h \
     $$PWD/QFFmpegFrame.h \
     $$PWD/QFFmpegManager.h \
     $$PWD/QFFmpegPacket.h \
     $$PWD/QFFmpegPlayer.h \
+    $$PWD/QFFmpegRender.h \
     $$PWD/QFFmpegResampler.h \
     $$PWD/QFFmpegSynchronizer.h \
     $$PWD/QFFmpegThreader.h \
-    $$PWD/QFFmpegVideoDecoder.h \
-    $$PWD/QImageUitls.h
+    $$PWD/QFFmpegVideoDecoder.h
 
 SOURCES += \
-    $$PWD/AudioRender.cpp \
     $$PWD/QFFmpegAudioDecoder.cpp \
     $$PWD/QFFmpegDemuxer.cpp \
     $$PWD/QFFmpegFrame.cpp \
     $$PWD/QFFmpegManager.cpp \
     $$PWD/QFFmpegPacket.cpp \
     $$PWD/QFFmpegPlayer.cpp \
+    $$PWD/QFFmpegRender.cpp \
     $$PWD/QFFmpegResampler.cpp \
     $$PWD/QFFmpegSynchronizer.cpp \
     $$PWD/QFFmpegThreader.cpp \
-    $$PWD/QFFmpegVideoDecoder.cpp \
-    $$PWD/QImageUitls.cpp
+    $$PWD/QFFmpegVideoDecoder.cpp
 

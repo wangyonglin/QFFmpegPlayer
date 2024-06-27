@@ -10,7 +10,7 @@
 #include <QOpenGLFunctions_3_3_Core>
 
 #include "QFFmpegAudioDecoder.h"
-#include "AudioRender.h"
+#include "QFFmpegRender.h"
 
 #include <QWidget>
 #include <QObject>

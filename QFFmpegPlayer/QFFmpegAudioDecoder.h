@@ -2,7 +2,7 @@
 #define QFFMPEGAUDIODECODER_H
 #include <QPointer>
 #include "QFFmpegThreader.h"
-#include "AudioRender.h"
+#include "QFFmpegRender.h"
 #include "QFFmpegPacket.h"
 #include "QFFmpegFrame.h"
 #include "QFFmpegResampler.h"
@@ -18,7 +18,7 @@ public:
 private:
     virtual void loopRunnable();
     QFFmpegResampler av_resample;
-    AudioRender audio_render;
+    QFFmpegRender render;
     QFFmpegManager * manager;
     void BuildDecoder(AVCodecContext *codec_ctx, QFFmpegPacket *pkt_queue, QFFmpegFrame *frame_queue);
 public slots:
